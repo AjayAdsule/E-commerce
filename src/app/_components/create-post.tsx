@@ -1,43 +1,27 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { clientApi } from "~/trpc/react";
 
-import { api } from "~/trpc/react";
-
-export function CreatePost() {
-  const router = useRouter();
-  const [name, setName] = useState("");
-
-  const createPost = api.post.create.useMutation({
-    onSuccess: () => {
-      router.refresh();
-      setName("");
-    },
-  });
-
+const DummyComp = () => {
+  const mutation = clientApi.user.createUser.useMutation();
+  const users = clientApi.user.getUsers.useQuery();
+  const { data: session } = useSession();
+  console.log({ session, users: users.data });
+  const handleAdd = async () => {
+    mutation.mutate({
+      name: "ajay",
+      email: "ajay29@gmail.com",
+      role: "User",
+      password: "passwo",
+    });
+  };
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        createPost.mutate({ name });
-      }}
-      className="flex flex-col gap-2"
-    >
-      <input
-        type="text"
-        placeholder="Title"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full rounded-full px-4 py-2 text-black"
-      />
-      <button
-        type="submit"
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-        disabled={createPost.isPending}
-      >
-        {createPost.isPending ? "Submitting..." : "Submit"}
-      </button>
-    </form>
+    <>
+      <div>Dummy component</div>
+      <button onClick={handleAdd}>user</button>
+    </>
   );
-}
+};
+
+export default DummyComp;

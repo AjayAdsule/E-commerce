@@ -8,7 +8,15 @@ import SuperJSON from "superjson";
 
 import { type AppRouter } from "~/server/api/root";
 
-const createQueryClient = () => new QueryClient();
+// prevent unnecessary api calls when windows tab is switched
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
@@ -20,13 +28,13 @@ const getQueryClient = () => {
   return (clientQueryClientSingleton ??= createQueryClient());
 };
 
-export const api = createTRPCReact<AppRouter>();
+export const clientApi = createTRPCReact<AppRouter>();
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   const [trpcClient] = useState(() =>
-    api.createClient({
+    clientApi.createClient({
       links: [
         loggerLink({
           enabled: (op) =>
@@ -43,14 +51,14 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           },
         }),
       ],
-    })
+    }),
   );
 
   return (
     <QueryClientProvider client={queryClient}>
-      <api.Provider client={trpcClient} queryClient={queryClient}>
+      <clientApi.Provider client={trpcClient} queryClient={queryClient}>
         {props.children}
-      </api.Provider>
+      </clientApi.Provider>
     </QueryClientProvider>
   );
 }

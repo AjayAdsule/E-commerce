@@ -14,18 +14,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -61,7 +49,15 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    Profile       Profile?
+    role          Role      @default(User)
+    password      String?
+}
+
+enum Role {
+    Admin
+    User
+    Seller
 }
 
 model VerificationToken {
@@ -70,4 +66,54 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Profile {
+    id               String            @id @default(cuid())
+    userId           String            @unique
+    cart             Cart[]
+    Products         Products[]
+    OrderProducts    OrderedProducts[]
+    shipping_address String
+    user             User              @relation(fields: [userId], references: [id])
+}
+
+model Cart {
+    id        String   @id @default(cuid())
+    productid String
+    quantity  Int
+    profileId String?
+    Profile   Profile? @relation(fields: [profileId], references: [id])
+}
+
+model Products {
+    id                 String   @id @default(cuid())
+    sellerId           String
+    productName        String
+    productDescription String
+    coverImage         String
+    stock              Int
+    Images             Images[]
+    price              Int
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @default(now())
+    createdBy          Profile? @relation(fields: [sellerId], references: [id])
+}
+
+model Images {
+    id        String   @id @default(cuid())
+    image     String
+    productId String
+    product   Products @relation(fields: [productId], references: [id])
+}
+
+model OrderedProducts {
+    orderId      String   @id @default(cuid())
+    userId       String
+    orderAt      DateTime @default(now())
+    productId    String
+    price        Int
+    quantity     Int
+    delivaryDate DateTime
+    orderBy      Profile  @relation(fields: [userId], references: [id])
 }
