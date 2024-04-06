@@ -109,19 +109,14 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    session: async ({ session, user }) => {
-      console.log({ userSession: session, user });
-      if (user?.id) {
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            id: user.id,
-          },
-        };
-      } else {
-        return session; // Return the session without modification if user.id is undefined
-      }
+    session: ({ token, session }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
+      };
     },
   },
   debug: process.env.NODE_ENV === "development",

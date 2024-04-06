@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
         });
 
       const hashedPassword = await bcrypt.hash(password, 11);
-      console.log({ hashedPassword });
+
       const user = await db.user.create({
         data: {
           email,
