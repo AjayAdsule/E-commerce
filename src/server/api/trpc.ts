@@ -105,3 +105,24 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+export const sellerProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
+  const isSeller = await db.user.findUnique({
+    where: {
+      id: ctx.session.user.id,
+    },
+  });
+  if (isSeller?.role !== 'Seller')
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'If you want list product create seller accout',
+    });
+  return next({
+    ctx: {
+      session: { ...ctx.session, user: isSeller },
+    },
+  });
+});

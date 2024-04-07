@@ -76,6 +76,7 @@ model Profile {
     OrderProducts    OrderedProducts[]
     shipping_address String
     user             User              @relation(fields: [userId], references: [id])
+    
 }
 
 model Cart {
@@ -97,7 +98,7 @@ model Products {
     price              Int
     createdAt          DateTime @default(now())
     updatedAt          DateTime @default(now())
-    createdBy          Profile? @relation(fields: [sellerId], references: [id])
+    createdBy          Profile? @relation(fields: [sellerId], references: [userId])
 }
 
 model Images {
