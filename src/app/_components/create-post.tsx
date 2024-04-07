@@ -1,26 +1,28 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import { clientApi } from '~/trpc/react';
 
 const DummyComp = () => {
   const mutation = clientApi.seller.listProduct.useMutation();
   const createUser = clientApi.user.createUser.useMutation();
   const user = clientApi.user.getUsers.useQuery();
-  console.log({ user: user.data });
+  const { data: session } = useSession();
+  console.log({ user: user.data, session });
   const handleAdd = async () => {
-    mutation.mutate({
-      price: 300,
-      productName: 'Puma shoes',
-      productDescription: 'Puma seaker for steady go',
-      stock: 20,
-      coverImage: 'htts://image.com/',
-    });
-    // createUser.mutate({
-    //   email: 'seller1@gmail.com',
-    //   password: 'seller',
-    //   role: 'Seller',
-    //   name: 'cloud seller',
+    // mutation.mutate({
+    //   price: 300,
+    //   productName: 'Puma shoes',
+    //   productDescription: 'Puma seaker for steady go',
+    //   stock: 20,
+    //   coverImage: 'htts://image.com/',
     // });
+    createUser.mutate({
+      email: 'seller1@gmail.com',
+      password: 'seller',
+      role: 'Seller',
+      name: 'cloud seller',
+    });
   };
   return (
     <>

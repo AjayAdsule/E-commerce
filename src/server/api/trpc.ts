@@ -126,3 +126,17 @@ export const sellerProcedure = t.procedure.use(async ({ ctx, next }) => {
     },
   });
 });
+
+export const buyerProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user)
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'please login to proceed' });
+  const user = await db.user.findUnique({ where: { id: ctx.session.user.id } });
+  if (!user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'user is not found' });
+  if (user.role !== 'User')
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'please create a buyer account' });
+  return next({
+    ctx: {
+      session: { ...ctx.session, user },
+    },
+  });
+});

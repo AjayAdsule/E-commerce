@@ -32,7 +32,23 @@ export const userRouter = createTRPCRouter({
         });
 
       const hashedPassword = await bcrypt.hash(password, 11);
-
+      if (role === 'Seller') {
+        const user = await db.user.create({
+          data: {
+            name,
+            email,
+            role,
+            password: hashedPassword,
+            sellerProfile: {
+              create: {},
+            },
+          },
+          include: {
+            sellerProfile: true,
+          },
+        });
+        return user;
+      }
       const user = await db.user.create({
         data: {
           email,
@@ -45,9 +61,6 @@ export const userRouter = createTRPCRouter({
             },
           },
         },
-        include: {
-          Profile: true,
-        },
       });
       if (!user)
         throw new TRPCError({
@@ -56,16 +69,8 @@ export const userRouter = createTRPCRouter({
         });
       return user;
     }),
-  getUsers: publicProcedure.query(async ({ ctx }) => {
-    const users = await ctx.db.user.findMany({
-      include: {
-        Profile: {
-          include: {
-            Products: true,
-          },
-        },
-      },
-    });
+  getUsers: protectedProcedure.query(async ({ ctx }) => {
+    const users = await ctx.db.user.findMany();
     return users;
   }),
   deleteUser: publicProcedure.mutation(async () => {

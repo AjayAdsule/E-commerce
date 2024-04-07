@@ -42,15 +42,16 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String         @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?        @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     Profile       Profile?
-    role          Role      @default(User)
+    sellerProfile SellerProfile?
+    role          Role           @default(User)
     password      String?
 }
 
@@ -72,23 +73,28 @@ model Profile {
     id               String            @id @default(cuid())
     userId           String            @unique
     cart             Cart[]
-    Products         Products[]
     OrderProducts    OrderedProducts[]
     shipping_address String
     user             User              @relation(fields: [userId], references: [id])
-    
+}
+
+model SellerProfile {
+    sellerProfileId String            @id
+    user            User              @relation(fields: [sellerProfileId], references: [id])
+    Products        Products[]
+    OrderedProducts OrderedProducts[]
 }
 
 model Cart {
     id        String   @id @default(cuid())
-    productid String
+    productId String
     quantity  Int
-    profileId String?
-    Profile   Profile? @relation(fields: [profileId], references: [id])
+    buyerId   String?
+    Profile   Profile? @relation(fields: [buyerId], references: [userId])
 }
 
 model Products {
-    id                 String   @id @default(cuid())
+    id                 String         @id @default(cuid())
     sellerId           String
     productName        String
     productDescription String
@@ -96,9 +102,9 @@ model Products {
     stock              Int
     Images             Images[]
     price              Int
-    createdAt          DateTime @default(now())
-    updatedAt          DateTime @default(now())
-    createdBy          Profile? @relation(fields: [sellerId], references: [userId])
+    createdAt          DateTime       @default(now())
+    updatedAt          DateTime       @default(now())
+    createdBy          SellerProfile? @relation(fields: [sellerId], references: [sellerProfileId])
 }
 
 model Images {
@@ -109,12 +115,14 @@ model Images {
 }
 
 model OrderedProducts {
-    orderId      String   @id @default(cuid())
+    orderId      String        @id @default(cuid())
     userId       String
-    orderAt      DateTime @default(now())
+    sellerId     String
+    orderAt      DateTime      @default(now())
     productId    String
     price        Int
     quantity     Int
     delivaryDate DateTime
-    orderBy      Profile  @relation(fields: [userId], references: [id])
+    orderBy      Profile       @relation(fields: [userId], references: [id])
+    sellBy       SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
 }
