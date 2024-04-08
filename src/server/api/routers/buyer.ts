@@ -34,29 +34,7 @@ export const buyerRouter = createTRPCRouter({
   updateQuantity: buyerProcedure
     .input(z.object({ updatedQuantity: z.number(), cartId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { session } = ctx;
       const { cartId, updatedQuantity } = input;
-
-      // const updateCartQuantity = await ctx.db.profile.update({
-      //   where: {
-      //     userId: session.user.id,
-      //   },
-      //   data: {
-      //     cart: {
-      //       update: {
-      //         where: {
-      //           id: cartId,
-      //         },
-      //         data: {
-      //           quantity: updatedQuantity,
-      //         },
-      //       },
-      //     },
-      //   },
-      // });
-      // if (!updateCartQuantity)
-      //   throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to update cart quantity' });
-      // return updateCartQuantity;
       const updateCartQuantity = await ctx.db.cart.update({
         where: { id: cartId },
         data: {
@@ -65,4 +43,34 @@ export const buyerRouter = createTRPCRouter({
       });
       return updateCartQuantity;
     }),
+  deleteProductFromCart: buyerProcedure
+    .input(z.object({ cartId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const deleteProduct = await ctx.db.cart.delete({ where: { id: input.cartId } });
+      if (!deleteProduct)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to delete product from cart' });
+      return deleteProduct;
+    }),
+  getCartProduct: buyerProcedure.query(async ({ ctx }) => {
+    const { user } = ctx.session;
+    const getBuyerCartItem = await ctx.db.cart.findMany({ where: { buyerId: user.id } });
+
+    if (!getBuyerCartItem)
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to get cart items' });
+    // Todo: store buyer product id in array and make a query where delete all products that stock is 0
+
+    // save buyer product ids in array to find product from product model
+    const productIdArr = getBuyerCartItem.map((product) => product.productId);
+    const buyerProduct = await ctx.db.products.findMany({ where: { id: { in: productIdArr } } });
+    if (!buyerProduct)
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to find buyer product' });
+    const buyerCartWithProduct = getBuyerCartItem.map((cartItem) => {
+      const product = buyerProduct.find((products) => products.id === cartItem.productId);
+      return {
+        ...cartItem,
+        product,
+      };
+    });
+    return buyerCartWithProduct;
+  }),
 });
