@@ -123,6 +123,7 @@ model OrderedProducts {
     price        Int
     quantity     Int
     delivaryDate DateTime
+    status       String
     orderBy      Profile       @relation(fields: [userId], references: [id])
     sellBy       SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
 }

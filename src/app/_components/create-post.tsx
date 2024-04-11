@@ -4,11 +4,15 @@ import { useSession } from 'next-auth/react';
 import { clientApi } from '~/trpc/react';
 
 const DummyComp = () => {
-  const mutation = clientApi.seller.listProduct.useMutation();
-  const createUser = clientApi.user.createUser.useMutation();
+  // const mutation = clientApi.seller.listProduct.useMutation();
+  // const createUser = clientApi.user.createUser.useMutation();
+  const listProduct = clientApi.seller.listProduct.useMutation();
+  const addToCart = clientApi.buyer.addToCart.useMutation();
   const user = clientApi.user.getUsers.useQuery();
   const { data: session } = useSession();
-  console.log({ user: user.data, session });
+  const { data: userCartProduct } = clientApi.buyer.getCartProduct.useQuery();
+  console.log({ userCartProduct });
+
   const handleAdd = async () => {
     // mutation.mutate({
     //   price: 300,
@@ -17,12 +21,26 @@ const DummyComp = () => {
     //   stock: 20,
     //   coverImage: 'htts://image.com/',
     // });
-    createUser.mutate({
-      email: 'seller1@gmail.com',
-      password: 'seller',
-      role: 'Seller',
-      name: 'cloud seller',
-    });
+
+    // createUser.mutate({
+    //   email: 'buyer@gmail.com',
+    //   password: 'buyer',
+    //   role: 'User',
+    //   name: 'buyer',
+    // });
+
+    // listProducts
+    // listProduct.mutate({
+    //   productName: 'Nike',
+    //   coverImage: 'http://dummy.img',
+    //   productDescription: 'nike shoes with lace',
+    //   price: 1999,
+    //   stock: 12,
+    // });
+
+    // addToCart
+
+    addToCart.mutate({ quantity: 1, productId: 'cluu2o19p0005x6yjftavmo0n' });
   };
   return (
     <>
