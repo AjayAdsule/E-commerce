@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { buyerProcedure, createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import { db } from '~/server/db';
 import bcrypt from 'bcrypt';
@@ -76,5 +76,18 @@ export const userRouter = createTRPCRouter({
   deleteUser: publicProcedure.mutation(async () => {
     const deleteUser = await db.user.deleteMany();
     return deleteUser;
+  }),
+  getUserOrderedProducts: buyerProcedure.query(async ({ ctx }) => {
+    console.log(ctx.session.user.id);
+    const orderedProducts = await ctx.db.profile.findUnique({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      include: {
+        OrderProducts: true,
+      },
+    });
+    if (!orderedProducts) throw new TRPCError({ code: 'NOT_FOUND', message: 'No data found' });
+    return orderedProducts;
   }),
 });

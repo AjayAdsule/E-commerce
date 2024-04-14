@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { buyerProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
+import Stripe from 'stripe';
+import { env } from '~/env';
+
+const LineItem = z.object({
+  name: z.string(),
+  amount: z.number(),
+  currency: z.string(),
+  quantity: z.number(),
+});
+
+const LineItems = z.array(LineItem);
 
 export const buyerRouter = createTRPCRouter({
   addToCart: protectedProcedure
@@ -72,5 +83,67 @@ export const buyerRouter = createTRPCRouter({
       };
     });
     return buyerCartWithProduct;
+  }),
+  proceedToBuy: buyerProcedure
+    .input(
+      z.array(
+        z.object({
+          price: z.number(),
+          sellerId: z.string(),
+          quantity: z.number(),
+          productId: z.string(),
+        }),
+      ),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { ...data } = input;
+      interface Payload {
+        price: number;
+        sellerId: string;
+        productId: string;
+        quantity: number;
+      }
+      const createdOrder = await Promise.all(
+        Object.keys(data)?.map(async (key: string) => {
+          const payload: Payload = data[key] as Payload;
+          const createOrder = await ctx.db.orderedProducts.create({
+            data: {
+              price: payload.price,
+              productId: payload.productId,
+              sellerId: payload.sellerId,
+              userId: ctx.session.user.id,
+              quantity: payload.quantity,
+              delivaryDate: new Date(2024, 3, 12, 14, 30, 0),
+              status: 'Pending',
+            },
+          });
+          return createOrder;
+        }),
+      );
+      return createdOrder;
+    }),
+  checkout: buyerProcedure.input(LineItem).mutation(async ({ input }) => {
+    const { amount, currency, name, quantity } = input;
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+    const payment = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: currency,
+            unit_amount: amount,
+            product_data: {
+              name: name,
+              description: 'Comfortable cotton t-shirt',
+              images: ['https://example.com/t-shirt.png'],
+            },
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'http://localhost:3000',
+      cancel_url: 'http://localhost:3000',
+    });
+    return payment;
   }),
 });

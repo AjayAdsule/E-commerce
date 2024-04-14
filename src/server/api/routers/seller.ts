@@ -62,4 +62,16 @@ export const sellerRouter = createTRPCRouter({
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Product not found' });
       return product;
     }),
+  getSellProduct: sellerProcedure.query(async ({ ctx }) => {
+    const selledProduct = await ctx.db.sellerProfile.findUnique({
+      where: {
+        sellerProfileId: ctx.session.user.id,
+      },
+      include: {
+        OrderedProducts: true,
+      },
+    });
+    if (!selledProduct) throw new TRPCError({ code: 'NOT_FOUND', message: 'product not found' });
+    return selledProduct;
+  }),
 });

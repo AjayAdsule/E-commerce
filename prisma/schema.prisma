@@ -115,15 +115,16 @@ model Images {
 }
 
 model OrderedProducts {
-    orderId      String        @id @default(cuid())
-    userId       String
-    sellerId     String
-    orderAt      DateTime      @default(now())
-    productId    String
-    price        Int
-    quantity     Int
-    delivaryDate DateTime
-    status       String
-    orderBy      Profile       @relation(fields: [userId], references: [id])
-    sellBy       SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
+    orderId       String        @id @default(cuid())
+    userId        String
+    sellerId      String
+    orderAt       DateTime      @default(now())
+    productId     String
+    price         Int
+    quantity      Int
+    delivaryDate  DateTime
+    status        String
+    paymentMethod String
+    orderBy       Profile       @relation(fields: [userId], references: [userId])
+    sellBy        SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
 }
