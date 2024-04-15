@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background-color: #e2e8f0;
+
+    --primary-color: #479ee3;
+    --primary-foreground: #0f172a;
+
+    --secondary-color: #00ca56;
+    --secondary-foreground: #f8fafc;
+
+    --muted: #f1f5f9;
+    --muter-foreground: #64748b;
+
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+
+    --destructive: #dc2626;
+    --destructive-foreground: #f8fafc;
+
+    --input: #e2e8f0;
+    --border: #e2e8f0;
+    --ring: #020817;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background-color: #35374b;
+
+    --primary-color: #76abae;
+    --primary-foreground: #0f172a;
+
+    --secondary-color: #b25068;
+    --secondary-foreground: #f8fafc;
+
+    --muted: #1e293b;
+    --muter-foreground: #94a3b8;
+
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
+
+    --destructive: #dc2626;
+    --destructive-foreground: #f8fafc;
+
+    --input: #1e293b;
+    --border: #1e293b;
+    --ring: #cbd5e1;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+}

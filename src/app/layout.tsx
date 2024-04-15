@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import { TRPCReactProvider } from '~/trpc/react';
 import { getServerAuthSession } from '~/server/auth';
 import SessionProvider from '~/components/SessionProvider';
+import ThemeProvider from '~/components/theme-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,7 +25,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang='en'>
       <body className={`font-sans ${inter.variable}`}>
         <SessionProvider session={session}>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <ThemeProvider
+              attribute='class'
+              defaultTheme='dark'
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </TRPCReactProvider>
         </SessionProvider>
       </body>
     </html>
