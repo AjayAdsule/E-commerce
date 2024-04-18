@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background-color: #e2e8f0;
+    --background-color: #ffffff;
 
     --primary-color: #479ee3;
     --primary-foreground: #0f172a;
 
     --secondary-color: #00ca56;
-    --secondary-foreground: #f8fafc;
+    --secondary-foreground: #0f172a;
 
     --muted: #f1f5f9;
     --muter-foreground: #64748b;
@@ -22,7 +22,7 @@
     --destructive-foreground: #f8fafc;
 
     --input: #e2e8f0;
-    --border: #e2e8f0;
+    --border: #1e293b;
     --ring: #020817;
     --radius: 0.5rem;
   }
@@ -46,7 +46,7 @@
     --destructive-foreground: #f8fafc;
 
     --input: #1e293b;
-    --border: #1e293b;
+    --border: #e2e8f0;
     --ring: #cbd5e1;
   }
 }

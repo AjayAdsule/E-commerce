@@ -6,6 +6,7 @@ import { TRPCReactProvider } from '~/trpc/react';
 import { getServerAuthSession } from '~/server/auth';
 import SessionProvider from '~/components/SessionProvider';
 import ThemeProvider from '~/components/theme-provider';
+import Navbar from '~/components/common/Navbar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,16 +24,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang='en'>
-      <body className={`font-sans ${inter.variable}`}>
+      <body className={`font-sans ${inter.variable} bg-background`}>
         <SessionProvider session={session}>
           <TRPCReactProvider>
             <ThemeProvider
               attribute='class'
-              defaultTheme='dark'
+              defaultTheme='light'
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <Navbar />
+              <main> {children}</main>
             </ThemeProvider>
           </TRPCReactProvider>
         </SessionProvider>
