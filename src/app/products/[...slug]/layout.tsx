@@ -9,10 +9,10 @@ export default function DynamicProductLayout({
 }) {
   return (
     <div className='container mt-3 flex h-[90vh]'>
-      <aside className='side_bar h- w-1/4 border-2'>
+      <aside className='side_bar h- w-1/6 border-2 p-4'>
         <FilerSideBar slug={params.slug} />
       </aside>
-      <div className='w-3/4 border-2'>{children}</div>
+      <div className='w-5/6 border-2'>{children}</div>
     </div>
   );
 }

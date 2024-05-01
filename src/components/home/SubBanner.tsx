@@ -17,7 +17,7 @@ export default SubBanner;
 
 const BannerCard = ({ ...product }: ProductData) => {
   return (
-    <div className='h-[22rem] w-52 rounded-md border-2'>
+    <div className='h-[22rem] w-52 rounded-md border-2 cursor-pointer'>
       <div className='card_media'>
         <img src={product.src} alt='tees' className='h-fit' />
       </div>
