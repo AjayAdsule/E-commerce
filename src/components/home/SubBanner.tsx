@@ -1,6 +1,15 @@
+'use client';
+
 import { trendingData } from '~/lib/commonUtils';
 import { type ProductData } from '~/lib/commonUtils';
+import { clientApi } from '~/trpc/react';
 const SubBanner = () => {
+  const { data, isLoading } = clientApi.product.getProductByParams.useQuery({
+    brand: ['Puma', 'Nike'],
+    price: [1999],
+    color: [],
+  });
+
   return (
     <div className='container'>
       <h4 className='header mb-8 mt-2 text-center text-2xl font-medium'>Trending</h4>
@@ -12,12 +21,13 @@ const SubBanner = () => {
     </div>
   );
 };
+``;
 
 export default SubBanner;
 
-const BannerCard = ({ ...product }: ProductData) => {
+export const BannerCard = ({ ...product }: ProductData) => {
   return (
-    <div className='h-[22rem] w-52 rounded-md border-2 cursor-pointer'>
+    <div className='h-[22rem] w-52 cursor-pointer rounded-md border-2'>
       <div className='card_media'>
         <img src={product.src} alt='tees' className='h-fit' />
       </div>
