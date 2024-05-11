@@ -4,11 +4,8 @@ import { trendingData } from '~/lib/commonUtils';
 import { type ProductData } from '~/lib/commonUtils';
 import { clientApi } from '~/trpc/react';
 const SubBanner = () => {
-  const { data, isLoading } = clientApi.product.getProductByParams.useQuery({
-    brand: ['Puma', 'Nike'],
-    price: [1999],
-    color: [],
-  });
+  const { mutate: cartMutate } = clientApi.buyer.addToCart.useMutation();
+  const { data } = clientApi.buyer.getCartProduct.useQuery();
 
   return (
     <div className='container'>

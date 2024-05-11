@@ -74,4 +74,31 @@ export const sellerRouter = createTRPCRouter({
     if (!selledProduct) throw new TRPCError({ code: 'NOT_FOUND', message: 'product not found' });
     return selledProduct;
   }),
+  addStock: sellerProcedure
+    .input(
+      z.object({
+        size: z.enum(['sm', 'xs', 'md', 'lg', 'xl']),
+        colors: z.array(z.object({ color: z.string(), count: z.number() })),
+        productId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { size, colors, productId } = input;
+      //* the stock count will be done on based on color count data
+      let totalStockSizeWise = 0;
+      if (colors) {
+        for (let i = 0; i < colors?.length; i++) {
+          if (colors[i]?.count) {
+            totalStockSizeWise += colors[i]?.count ?? 0;
+          }
+        }
+      }
+
+      const createSize = await ctx?.db?.sizeModal?.create({
+        data: { size, colors, productId, stock: totalStockSizeWise },
+      });
+      if (!createSize)
+        throw new TRPCError({ code: 'UNPROCESSABLE_CONTENT', message: 'unable to add colors' });
+      return createSize;
+    }),
 });

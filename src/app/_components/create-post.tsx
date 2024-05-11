@@ -70,9 +70,7 @@ const DummyComp = () => {
       quantity: 1,
     });
 
-    console.log({ checkoutSession });
     const result = await stripe?.redirectToCheckout({ sessionId: checkoutSession.id });
-    console.log({ result });
   };
   return (
     <>

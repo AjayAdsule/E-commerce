@@ -91,6 +91,7 @@ model Cart {
     quantity  Int
     buyerId   String?
     Profile   Profile? @relation(fields: [buyerId], references: [userId])
+    createdAt DateTime @default(now())
 }
 
 model Products {
@@ -105,11 +106,29 @@ model Products {
     createdAt          DateTime       @default(now())
     updatedAt          DateTime       @default(now())
     createdBy          SellerProfile? @relation(fields: [sellerId], references: [sellerProfileId])
+    sizes              SizeModal[]
 }
 
 model Images {
     id        String   @id @default(cuid())
     image     String
+    productId String
+    product   Products @relation(fields: [productId], references: [id])
+}
+
+enum Size {
+    xs
+    sm
+    md
+    lg
+    xl
+}
+
+model SizeModal {
+    id        String   @id @default(cuid())
+    size      Size
+    stock     Int
+    colors    Json
     productId String
     product   Products @relation(fields: [productId], references: [id])
 }

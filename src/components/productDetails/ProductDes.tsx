@@ -1,5 +1,7 @@
+import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import ColorBtn from './ColorBtn';
+import QuantityBtn from './QuantityBtn';
 import SizeBtnCom from './SizeBtnCom';
 
 export default function ProductDescription() {
@@ -27,6 +29,12 @@ export default function ProductDescription() {
           <SizeBtnCom />
         </div>
         <Separator className='my-4 bg-gray-500' />
+        <div className='actions flex gap-x-6'>
+          <QuantityBtn />
+          <Button className='rounded-lg text-white' size='lg'>
+            Add To Cart
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -16,31 +16,31 @@ const LineItems = z.array(LineItem);
 export const buyerRouter = createTRPCRouter({
   addToCart: protectedProcedure
     .input(
-      z.object({
-        productId: z.string(),
-        quantity: z.number(),
-      }),
+      z.array(
+        z.object({
+          productId: z.string(),
+          quantity: z.number(),
+        }),
+      ),
     )
     .mutation(async ({ ctx, input }) => {
-      const { productId, quantity } = input;
       const { session } = ctx;
 
-      //find product form modal and check product is available
-      const product = await ctx.db.products.findUnique({ where: { id: productId } });
-      if (!product) throw new TRPCError({ code: 'BAD_REQUEST', message: 'product not found' });
+      const createCartItem = await Promise.all(
+        input.map(async (cartItems) => {
+          const { productId, quantity } = cartItems;
+          const addProductToCart = await ctx.db.cart.create({
+            data: { productId, quantity, buyerId: session.user.id },
+          });
 
-      //check stock and quantity if quantity exceeds throw error
-      const stock = product?.stock;
-      if (quantity > stock)
-        throw new TRPCError({ code: 'PAYLOAD_TOO_LARGE', message: 'max quantity exceeded' });
+          if (!addProductToCart)
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'Product not added to cart' });
+          return addProductToCart;
+        }),
+      );
 
-      //add product to cart
-      const addProductToCart = await ctx.db.cart.create({
-        data: { productId, quantity, buyerId: session.user.id },
-      });
-      if (!addProductToCart)
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Product not added to cart' });
-      return addProductToCart;
+      if (!createCartItem)
+        throw new TRPCError({ code: 'CONFLICT', message: 'unable to create request' });
     }),
   updateQuantity: buyerProcedure
     .input(z.object({ updatedQuantity: z.number(), cartId: z.string() }))
