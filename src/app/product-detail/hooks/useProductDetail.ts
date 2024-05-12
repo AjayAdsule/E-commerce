@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { clientApi } from '~/trpc/react';
 
 type SizeProps = Record<string, number | undefined>;
 type ColorProps = Record<string, string | undefined>;
@@ -10,7 +11,7 @@ export default function useProductDetails() {
   const [selectedSize, setSelectedSize] = useState('medium');
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
-
+  const { mutate: cartMutate } = clientApi.buyer.addToCart.useMutation();
   const handleSizeChange = (value: string) => {
     setSelectedSize(value);
   };
@@ -22,7 +23,9 @@ export default function useProductDetails() {
   const handleDecrementQuantity = () => {
     setQuantity(quantity - 1);
   };
-
+  const handleAddToCart = () => {
+    cartMutate({ productId: 'cluyqfqek0006o21ztszpw290', quantity: 2 });
+  };
   return {
     selectedSize,
     setSelectedSize,
@@ -35,5 +38,6 @@ export default function useProductDetails() {
     handleIncrementQuantity,
     handleDecrementQuantity,
     quantity,
+    handleAddToCart,
   };
 }

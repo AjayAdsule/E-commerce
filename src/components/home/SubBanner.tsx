@@ -1,12 +1,7 @@
-'use client';
-
 import { trendingData } from '~/lib/commonUtils';
 import { type ProductData } from '~/lib/commonUtils';
-import { clientApi } from '~/trpc/react';
-const SubBanner = () => {
-  const { mutate: cartMutate } = clientApi.buyer.addToCart.useMutation();
-  const { data } = clientApi.buyer.getCartProduct.useQuery();
 
+const SubBanner = () => {
   return (
     <div className='container'>
       <h4 className='header mb-8 mt-2 text-center text-2xl font-medium'>Trending</h4>

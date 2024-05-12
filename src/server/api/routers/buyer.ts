@@ -16,32 +16,33 @@ const LineItems = z.array(LineItem);
 export const buyerRouter = createTRPCRouter({
   addToCart: protectedProcedure
     .input(
-      z.array(
-        z.object({
-          productId: z.string(),
-          quantity: z.number(),
-        }),
-      ),
+      z.object({
+        productId: z.string(),
+        quantity: z.number(),
+      }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { productId, quantity } = input;
       const { session } = ctx;
 
-      const createCartItem = await Promise.all(
-        input.map(async (cartItems) => {
-          const { productId, quantity } = cartItems;
-          const addProductToCart = await ctx.db.cart.create({
-            data: { productId, quantity, buyerId: session.user.id },
-          });
+      //find product form modal and check product is available
+      const product = await ctx.db.products.findUnique({ where: { id: productId } });
+      if (!product) throw new TRPCError({ code: 'BAD_REQUEST', message: 'product not found' });
 
-          if (!addProductToCart)
-            throw new TRPCError({ code: 'BAD_REQUEST', message: 'Product not added to cart' });
-          return addProductToCart;
-        }),
-      );
+      //check stock and quantity if quantity exceeds throw error
+      const stock = product?.stock;
+      if (quantity > stock)
+        throw new TRPCError({ code: 'PAYLOAD_TOO_LARGE', message: 'max quantity exceeded' });
 
-      if (!createCartItem)
-        throw new TRPCError({ code: 'CONFLICT', message: 'unable to create request' });
+      //add product to cart
+      const addProductToCart = await ctx.db.cart.create({
+        data: { productId, quantity, buyerId: session.user.id },
+      });
+      if (!addProductToCart)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Product not added to cart' });
+      return addProductToCart;
     }),
+
   updateQuantity: buyerProcedure
     .input(z.object({ updatedQuantity: z.number(), cartId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -84,44 +85,44 @@ export const buyerRouter = createTRPCRouter({
     });
     return buyerCartWithProduct;
   }),
-  proceedToBuy: buyerProcedure
-    .input(
-      z.array(
-        z.object({
-          price: z.number(),
-          sellerId: z.string(),
-          quantity: z.number(),
-          productId: z.string(),
-        }),
-      ),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { ...data } = input;
-      interface Payload {
-        price: number;
-        sellerId: string;
-        productId: string;
-        quantity: number;
-      }
-      const createdOrder = await Promise.all(
-        Object.keys(data)?.map(async (key: string) => {
-          const payload: Payload = data[key] as Payload;
-          const createOrder = await ctx.db.orderedProducts.create({
-            data: {
-              price: payload.price,
-              productId: payload.productId,
-              sellerId: payload.sellerId,
-              userId: ctx.session.user.id,
-              quantity: payload.quantity,
-              delivaryDate: new Date(2024, 3, 12, 14, 30, 0),
-              status: 'Pending',
-            },
-          });
-          return createOrder;
-        }),
-      );
-      return createdOrder;
-    }),
+  // proceedToBuy: buyerProcedure
+  //   .input(
+  //     z.array(
+  //       z.object({
+  //         price: z.number(),
+  //         sellerId: z.string(),
+  //         quantity: z.number(),
+  //         productId: z.string(),
+  //       }),
+  //     ),
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     const { ...data } = input;
+  //     interface Payload {
+  //       price: number;
+  //       sellerId: string;
+  //       productId: string;
+  //       quantity: number;
+  //     }
+  //     const createdOrder = await Promise.all(
+  //       Object.keys(data)?.map(async (key: string) => {
+  //         const payload: Payload = data[key] as Payload;
+  //         const createOrder = await ctx.db.orderedProducts.create({
+  //           data: {
+  //             price: payload.price,
+  //             productId: payload.productId,
+  //             sellerId: payload.sellerId,
+  //             userId: ctx.session.user.id,
+  //             quantity: payload.quantity,
+  //             delivaryDate: new Date(2024, 3, 12, 14, 30, 0),
+  //             status: 'Pending',
+  //           },
+  //         });
+  //         return createOrder;
+  //       }),
+  //     );
+  //     return createdOrder;
+  //   }),
   checkout: buyerProcedure.input(LineItem).mutation(async ({ input }) => {
     const { amount, currency, name, quantity } = input;
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);

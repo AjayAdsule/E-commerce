@@ -1,7 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { clientApi } from '~/trpc/react';
 
-export default async function usePayment() {
+export default function usePayment() {
   const { mutateAsync: checkout } = clientApi.buyer.checkout.useMutation();
 
   const stripePromise = loadStripe(

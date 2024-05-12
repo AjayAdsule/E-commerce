@@ -1,10 +1,10 @@
-import { Button } from '../ui/button';
+import usePayment from '~/app/product-detail/hooks/usePayment';
 import { Separator } from '../ui/separator';
 import ColorBtn from './ColorBtn';
 import QuantityBtn from './QuantityBtn';
 import SizeBtnCom from './SizeBtnCom';
 
-export default function ProductDescription() {
+export default async function ProductDescription() {
   return (
     <div className='h-full w-full '>
       <div>
@@ -29,11 +29,8 @@ export default function ProductDescription() {
           <SizeBtnCom />
         </div>
         <Separator className='my-4 bg-gray-500' />
-        <div className='actions flex gap-x-6'>
+        <div className='actions '>
           <QuantityBtn />
-          <Button className='rounded-lg text-white' size='lg'>
-            Add To Cart
-          </Button>
         </div>
       </div>
     </div>

@@ -91,7 +91,7 @@ model Cart {
     quantity  Int
     buyerId   String?
     Profile   Profile? @relation(fields: [buyerId], references: [userId])
-    createdAt DateTime @default(now())
+    // createdAt DateTime @default(now())
 }
 
 model Products {
