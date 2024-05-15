@@ -7,6 +7,7 @@ export const commonRouter = createTRPCRouter({
     const products = await db.products.findMany({
       include: {
         sizes: true,
+        Images: true,
       },
     });
     if (!products) throw new TRPCError({ code: 'NOT_FOUND', message: 'Unable to find products' });

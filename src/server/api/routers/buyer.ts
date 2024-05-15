@@ -144,6 +144,9 @@ export const buyerRouter = createTRPCRouter({
       mode: 'payment',
       success_url: 'http://localhost:3000',
       cancel_url: 'http://localhost:3000',
+      metadata: {
+        cartId: 'cluyqd1nf0004o21z0gg6vkzj',
+      },
     });
     return payment;
   }),

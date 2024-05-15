@@ -91,7 +91,7 @@ model Cart {
     quantity  Int
     buyerId   String?
     Profile   Profile? @relation(fields: [buyerId], references: [userId])
-    // createdAt DateTime @default(now())
+    createdAt DateTime @default(now())
 }
 
 model Products {
@@ -111,7 +111,7 @@ model Products {
 
 model Images {
     id        String   @id @default(cuid())
-    image     String
+    image     Json
     productId String
     product   Products @relation(fields: [productId], references: [id])
 }

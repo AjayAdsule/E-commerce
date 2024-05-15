@@ -101,4 +101,19 @@ export const sellerRouter = createTRPCRouter({
         throw new TRPCError({ code: 'UNPROCESSABLE_CONTENT', message: 'unable to add colors' });
       return createSize;
     }),
+
+  addImages: sellerProcedure
+    .input(z.object({ productId: z.string(), image: z.array(z.string()) }))
+    .mutation(async ({ ctx, input }) => {
+      const { image, productId } = input;
+      const addImageInDb = await ctx.db.images.create({
+        data: {
+          image,
+          productId,
+        },
+      });
+      if (!addImageInDb)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to add images' });
+      return addImageInDb;
+    }),
 });

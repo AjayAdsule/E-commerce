@@ -8,7 +8,12 @@ import { clientApi } from '~/trpc/react';
 const QuantityBtn = () => {
   const { handleAddToCart, handleIncrementQuantity, handleDecrementQuantity, quantity } =
     useProductDetails();
-  const { data } = clientApi.buyer.getCartProduct.useQuery();
+  const { mutate } = clientApi.seller.addImages.useMutation();
+
+  const handleMutate = () => {
+    mutate({ productId: 'cluyqd1nf0004o21z0gg6vkzj', image: ['dummy0', 'dummy1', 'dummy2'] });
+  };
+
   return (
     <div className='flex gap-x-6'>
       <div className='flex w-[150px] justify-between rounded-md bg-[#e5e7eb]'>
@@ -30,7 +35,7 @@ const QuantityBtn = () => {
           <Plus size={16} strokeWidth={1} />
         </Button>
       </div>
-      <Button className='rounded-lg text-white' size='lg' onClick={handleAddToCart}>
+      <Button className='rounded-lg text-white' size='lg' onClick={handleMutate}>
         Add To Cart
       </Button>
     </div>
