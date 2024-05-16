@@ -12,6 +12,8 @@ export default function useProductDetails() {
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const { mutate: cartMutate } = clientApi.buyer.addToCart.useMutation();
+  const { data } = clientApi.product.getUniqueProductByParams.useQuery('cluyqd1nf0004o21z0gg6vkzj');
+
   const handleSizeChange = (value: string) => {
     setSelectedSize(value);
   };
