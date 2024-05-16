@@ -1,11 +1,16 @@
 'use client';
-
-import useProductDetails from '~/app/product-detail/hooks/useProductDetail';
+import { type ColorProps } from '~/app/product-detail/hooks/useProductDetail';
 import { Button } from '../ui/button';
 
-export default function ColorBtn() {
-  const { colors, handelColorChange, selectedColor } = useProductDetails();
-
+export default function ColorBtn({
+  colors,
+  handelColorChange,
+  selectedColor,
+}: {
+  colors: ColorProps;
+  handelColorChange: (value: string) => void;
+  selectedColor: string;
+}) {
   return (
     <>
       <p className='text-gray-500'>Select colors</p>

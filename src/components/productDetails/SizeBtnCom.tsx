@@ -1,11 +1,15 @@
 'use client';
 
 import React from 'react';
-import useProductDetails from '~/app/product-detail/hooks/useProductDetail';
+import { SizeProps } from '~/app/product-detail/hooks/useProductDetail';
 
-const SizeBtnCom = () => {
-  const { selectedSize, sizes, handleSizeChange } = useProductDetails();
+interface SizeBtnProps {
+  selectedSize: string;
+  sizes: SizeProps;
+  handleSizeChange: (value: string) => void;
+}
 
+const SizeBtnCom = ({ selectedSize, sizes, handleSizeChange }: SizeBtnProps) => {
   return (
     <>
       <p className='text-gray-500'>Choose Size</p>

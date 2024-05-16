@@ -1,8 +1,4 @@
-import usePayment from '~/app/product-detail/hooks/usePayment';
-import { Separator } from '../ui/separator';
-import ColorBtn from './ColorBtn';
-import QuantityBtn from './QuantityBtn';
-import SizeBtnCom from './SizeBtnCom';
+import ProductActions from './ProductActions';
 
 export default async function ProductDescription() {
   return (
@@ -20,18 +16,7 @@ export default async function ProductDescription() {
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. A, facere?
           </div>
         </article>
-        <Separator className='my-2 bg-gray-500' />
-        <div className='color_section mt-2'>
-          <ColorBtn />
-        </div>
-        <Separator className='my-4 bg-gray-500' />
-        <div className='size'>
-          <SizeBtnCom />
-        </div>
-        <Separator className='my-4 bg-gray-500' />
-        <div className='actions '>
-          <QuantityBtn />
-        </div>
+        <ProductActions />
       </div>
     </div>
   );

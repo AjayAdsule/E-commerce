@@ -2,12 +2,21 @@
 import { Minus, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/Input';
-import useProductDetails from '~/app/product-detail/hooks/useProductDetail';
 import { clientApi } from '~/trpc/react';
 
-const QuantityBtn = () => {
-  const { handleAddToCart, handleIncrementQuantity, handleDecrementQuantity, quantity } =
-    useProductDetails();
+interface QuantityBtnProps {
+  handleAddToCart: () => void;
+  handleIncrementQuantity: () => void;
+  handleDecrementQuantity: () => void;
+  quantity: number;
+}
+
+const QuantityBtn = ({
+  handleAddToCart,
+  handleIncrementQuantity,
+  handleDecrementQuantity,
+  quantity,
+}: QuantityBtnProps) => {
   const { mutate } = clientApi.seller.addImages.useMutation();
 
   const handleMutate = () => {
