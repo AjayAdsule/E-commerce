@@ -51,19 +51,21 @@ export const productRouter = createTRPCRouter({
       const getProduct = await ctx.db.products.findMany();
       return getProduct;
     }),
-  getUniqueProductByParams: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const getProduct = await ctx.db.products.findUnique({
-      where: {
-        id: input,
-      },
-      include: {
-        Images: true,
-        sizes: true,
-      },
-    });
-    if (!getProduct) throw new TRPCError({ code: 'BAD_REQUEST', message: 'product not found' });
-    return getProduct;
-  }),
+  getUniqueProductByParams: publicProcedure
+    .input(z.object({ params: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const getProduct = await ctx.db.products.findUnique({
+        where: {
+          id: input.params,
+        },
+        include: {
+          Images: true,
+          sizes: true,
+        },
+      });
+      if (!getProduct) throw new TRPCError({ code: 'BAD_REQUEST', message: 'product not found' });
+      return getProduct;
+    }),
 });
 
 //* get products by params i want to filter out product like category i want to append the params
