@@ -150,4 +150,14 @@ export const buyerRouter = createTRPCRouter({
     });
     return payment;
   }),
+
+  getCart: buyerProcedure.query(async ({ ctx }) => {
+    const getCart = await ctx.db.cart.findMany({
+      where: {
+        buyerId: ctx.session.user.id,
+      },
+    });
+    if (!getCart) return [];
+    return getCart;
+  }),
 });

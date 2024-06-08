@@ -67,9 +67,12 @@ export const authOptions: NextAuthOptions = {
           type: 'password',
           label: 'Password',
         },
+        role: {
+          type: 'text',
+          label: 'role',
+        },
       },
       async authorize(credentials) {
-        console.log({ credentials });
         if (!credentials?.email || !credentials?.password)
           throw new Error('please provide credentials');
 
