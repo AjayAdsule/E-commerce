@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import { Menu, Search, ShoppingCart, UserRound } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
-import { Input } from '../ui/Input';
-import { ThemeBtn } from './ThemeBtn';
-const Navbar = () => {
+import NavbarActions from './NavbarActions';
+
+const Navbar = async () => {
   return (
     <nav className=' flex h-[40px] justify-between p-4'>
       <div className='flex items-center'>
@@ -23,13 +23,9 @@ const Navbar = () => {
         <Link href='/shop' className='whitespace-nowrap'>
           Brands
         </Link>
-        <Input type='text' className='h-5' placeholder='Search' />
       </div>
-      <div className='flex gap-4'>
-        <Search size={18} strokeWidth={1} className='text-secondary-foreground' />
-        <ShoppingCart size={18} strokeWidth={1} className='text-secondary-foreground' />
-        <UserRound size={18} strokeWidth={1} className='text-secondary-foreground' />
-        <ThemeBtn />
+      <div className='flex justify-center gap-4'>
+        <NavbarActions />
       </div>
     </nav>
   );
