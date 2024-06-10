@@ -4,6 +4,7 @@ import { sellerRouter } from './routers/seller';
 import { buyerRouter } from './routers/buyer';
 import { commonRouter } from './routers/common';
 import { productRouter } from './routers/product';
+import { type inferRouterOutputs } from '@trpc/server';
 
 /**
  * This is the primary router for your server.
@@ -19,6 +20,8 @@ export const appRouter = createTRPCRouter({
 });
 
 // export type definition of API
+
+export type RouterOutput = inferRouterOutputs<AppRouter>;
 export type AppRouter = typeof appRouter;
 
 /**

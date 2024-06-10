@@ -1,8 +1,8 @@
+'use client';
 import React from 'react';
-import { Button } from '../ui/button';
 import PaymentBtn from '../common/PaymentBtn';
 
-const CartDetail = () => {
+const CartDetail = ({ product }) => {
   return (
     <>
       <div className='mb-2 flex justify-between'>
