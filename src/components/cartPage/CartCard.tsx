@@ -1,27 +1,26 @@
 'use client';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Minus, Plus } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { type RouterOutput } from '~/server/api/root';
-import { clientApi } from '~/trpc/react';
 
 interface CartCardProps {
   products: RouterOutput['buyer']['getCartProduct'][0];
+  handleQuantityChange: (quantity: number, cartId: string) => void;
 }
 
-const CartCard: React.FC<CartCardProps> = ({ products }) => {
+const CartCard: React.FC<CartCardProps> = ({ products, handleQuantityChange }) => {
   const [quantity, setQuantity] = useState(products.quantity);
-  const { mutate } = clientApi.buyer.updateQuantity.useMutation({
-    onSettled(data, error, variables, context) {
-      console.log({ data, error, variables, context });
-    },
-  });
-
-  const utils = clientApi.useUtils();
-
   const { product } = products;
+
+  useEffect(() => {
+    if (products.quantity !== quantity) {
+      handleQuantityChange(quantity, products.id);
+    }
+  }, [quantity]);
+
   return (
     <div className='mb-6 justify-between rounded-lg bg-white p-6 shadow-md sm:flex sm:justify-start'>
       <Image
@@ -46,7 +45,11 @@ const CartCard: React.FC<CartCardProps> = ({ products }) => {
             >
               <Minus size={16} strokeWidth={1} />
             </Button>
-            <Input className='w-[50px]  focus:outline-none' value={quantity} />
+            <Input
+              className='w-[50px]  focus:outline-none'
+              value={quantity}
+              id='product-quantity'
+            />
             <Button
               className=''
               size='icon'

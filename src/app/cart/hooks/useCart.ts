@@ -4,15 +4,20 @@
  * make a function that will update the cart quantity
  */
 
-import { useState } from 'react';
 import { clientApi } from '~/trpc/react';
 
 export default function useCart() {
+  const utils = clientApi.useUtils();
   const { data } = clientApi.buyer.getCartProduct.useQuery();
-
-  const [quantity, setQuantity] = useState(0);
+  const { mutate } = clientApi.buyer.updateQuantity.useMutation({
+    onSuccess: async () => await utils.buyer.getCartProduct.invalidate(),
+  });
+  const handleQuantityChange = async (quantity: number, cartId: string) => {
+    mutate({ updatedQuantity: quantity, cartId: cartId });
+  };
 
   return {
     data,
+    handleQuantityChange,
   };
 }
