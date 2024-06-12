@@ -5,7 +5,7 @@ import CartDetail from './CartDetail';
 import useCart from '~/app/cart/hooks/useCart';
 
 const Cart = () => {
-  const { data, handleQuantityChange } = useCart();
+  const { data, handleQuantityChange, subTotal } = useCart();
 
   return (
     <div className='h-screen bg-gray-100 pt-20'>
@@ -21,7 +21,7 @@ const Cart = () => {
           ))}
         </div>
         <div className='mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-1/3'>
-          <CartDetail product={data} />
+          <CartDetail subTotal={subTotal} />
         </div>
       </div>
     </div>
