@@ -3,27 +3,47 @@ import { buffer } from 'stream/consumers';
 import Stripe from 'stripe';
 import { env } from '~/env';
 
-export const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-04-10',
+});
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const signature = req.headers['stripe-signature'] as string;
-    const buf = await buffer(req);
+
     let event;
     try {
-      event = Stripe.webhooks.constructEvent(buf, signature, env.STRIPE_WEBHOOK_SECRET);
+      const buf = await buffer(req);
+      event = stripe.webhooks.constructEvent(buf, signature, env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
-      let msg = 'Unknown Error';
-      if (err instanceof Error) msg = err.message;
-      res.status(400).send(`webhook error ${msg}`);
+      let message = 'Unknown Error';
+      if (err instanceof Error) message = err.message;
+      res.status(400).send(`Webhook Error: ${message}`);
       return;
     }
-    console.log({ event });
+
+    // Handle the event
     switch (event.type) {
       case 'payment_intent.succeeded':
-        const paymentSucceed = event.data.object;
-        return res.json({ code: 'success', paymentSucceed });
+        const paymentIntent = event.data.object;
+        console.log('PaymentIntent was successfully!');
+        // Handle successful payment intent here
         break;
       default:
-        console.log(`unhandled event type ${event.type}`);
+        console.log(`Unhandled event type ${event.type}`);
     }
+
+    res.status(200).json({ received: true });
+  } else {
+    res.setHeader('Allow', 'POST');
+    res.status(405).end('Method Not Allowed');
   }
 };
+
+export default webhookHandler;
