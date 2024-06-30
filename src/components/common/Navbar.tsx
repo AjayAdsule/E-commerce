@@ -1,8 +1,10 @@
+'use client';
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import NavbarActions from './NavbarActions';
-
+import { RegisterLink, LoginLink } from '@kinde-oss/kinde-auth-nextjs/components';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 interface NavProps {
   name: string;
   href: string;
@@ -27,7 +29,9 @@ const NavLinks: NavProps[] = [
   },
 ];
 
-const Navbar = async () => {
+const Navbar = () => {
+  const { user } = useKindeBrowserClient();
+
   return (
     <nav className=' flex h-[40px] justify-between p-4'>
       <div className='flex items-center'>
@@ -40,6 +44,8 @@ const Navbar = async () => {
             {items.name}
           </Link>
         ))}
+        <LoginLink postLoginRedirectURL='/'>Sign in</LoginLink>
+        <RegisterLink postLoginRedirectURL='/'>Sign up</RegisterLink>
       </div>
       <div className='flex justify-center gap-4'>
         <NavbarActions />
