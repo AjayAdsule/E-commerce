@@ -23,6 +23,7 @@ export default function usePayment() {
       amount,
       quantity,
       currency: 'inr',
+      orderId: 'dummy',
     });
     const redirect = await stripe?.redirectToCheckout({ sessionId: orderPayload.id });
     return { redirect };

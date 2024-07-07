@@ -9,6 +9,7 @@ const LineItem = z.object({
   amount: z.number(),
   currency: z.string(),
   quantity: z.number(),
+  orderId: z.string(),
 });
 
 const LineItems = z.array(LineItem);
@@ -85,46 +86,9 @@ export const buyerRouter = createTRPCRouter({
     });
     return buyerCartWithProduct;
   }),
-  // proceedToBuy: buyerProcedure
-  //   .input(
-  //     z.array(
-  //       z.object({
-  //         price: z.number(),
-  //         sellerId: z.string(),
-  //         quantity: z.number(),
-  //         productId: z.string(),
-  //       }),
-  //     ),
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     const { ...data } = input;
-  //     interface Payload {
-  //       price: number;
-  //       sellerId: string;
-  //       productId: string;
-  //       quantity: number;
-  //     }
-  //     const createdOrder = await Promise.all(
-  //       Object.keys(data)?.map(async (key: string) => {
-  //         const payload: Payload = data[key] as Payload;
-  //         const createOrder = await ctx.db.orderedProducts.create({
-  //           data: {
-  //             price: payload.price,
-  //             productId: payload.productId,
-  //             sellerId: payload.sellerId,
-  //             userId: ctx.session.user.id,
-  //             quantity: payload.quantity,
-  //             delivaryDate: new Date(2024, 3, 12, 14, 30, 0),
-  //             status: 'Pending',
-  //           },
-  //         });
-  //         return createOrder;
-  //       }),
-  //     );
-  //     return createdOrder;
-  //   }),
+
   checkout: buyerProcedure.input(LineItem).mutation(async ({ input }) => {
-    const { amount, currency, name, quantity } = input;
+    const { amount, currency, name, quantity, orderId } = input;
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const payment = await stripe.checkout.sessions.create({
       line_items: [
@@ -142,13 +106,19 @@ export const buyerRouter = createTRPCRouter({
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:3000',
+      success_url: `http://localhost:3000/success/${orderId}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'http://localhost:3000',
       metadata: {
         cartId: 'cluyqd1nf0004o21z0gg6vkzj',
       },
     });
     return payment;
+  }),
+
+  orderStatus: buyerProcedure.input(z.string()).query(async ({ input }) => {
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+    const isPaid = await stripe.checkout.sessions.retrieve(input);
+    return isPaid;
   }),
 
   getCart: buyerProcedure.query(async ({ ctx }) => {
