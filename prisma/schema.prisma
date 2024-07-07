@@ -134,7 +134,7 @@ model SizeModal {
 }
 
 model OrderedProducts {
-    orderId       String        @id @default(cuid())
+    id            String        @id @default(cuid())
     userId        String
     sellerId      String
     orderAt       DateTime      @default(now())
@@ -146,4 +146,11 @@ model OrderedProducts {
     paymentMethod String
     orderBy       Profile       @relation(fields: [userId], references: [userId])
     sellBy        SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
+    orders        Orders        @relation(fields: [orderId], references: [orderId])
+    orderId       String
+}
+
+model Orders {
+    orderId         String            @id @default(cuid())
+    OrderedProducts OrderedProducts[]
 }

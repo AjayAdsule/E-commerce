@@ -1,5 +1,4 @@
 import { loadStripe } from '@stripe/stripe-js';
-import { env } from 'process';
 import { clientApi } from '~/trpc/react';
 
 export default function usePayment() {
@@ -12,10 +11,12 @@ export default function usePayment() {
     name,
     amount,
     quantity,
+    productId,
   }: {
     name: string;
     amount: number;
     quantity: number;
+    productId: string[];
   }) => {
     const stripe = await stripePromise;
     const orderPayload = await checkout({
@@ -24,6 +25,7 @@ export default function usePayment() {
       quantity,
       currency: 'inr',
       orderId: 'dummy',
+      productId,
     });
     const redirect = await stripe?.redirectToCheckout({ sessionId: orderPayload.id });
     return { redirect };

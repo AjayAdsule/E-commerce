@@ -10,9 +10,8 @@ const LineItem = z.object({
   currency: z.string(),
   quantity: z.number(),
   orderId: z.string(),
+  productId: z.array(z.string()),
 });
-
-const LineItems = z.array(LineItem);
 
 export const buyerRouter = createTRPCRouter({
   addToCart: protectedProcedure
@@ -56,6 +55,7 @@ export const buyerRouter = createTRPCRouter({
       });
       return updateCartQuantity;
     }),
+
   deleteProductFromCart: buyerProcedure
     .input(z.object({ cartId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -87,8 +87,26 @@ export const buyerRouter = createTRPCRouter({
     return buyerCartWithProduct;
   }),
 
-  checkout: buyerProcedure.input(LineItem).mutation(async ({ input }) => {
-    const { amount, currency, name, quantity, orderId } = input;
+  checkout: buyerProcedure.input(LineItem).mutation(async ({ ctx, input }) => {
+    const { amount, currency, name, quantity, productId } = input;
+    const buyerId = ctx.session?.user?.id;
+    if (!buyerId) {
+      throw new Error('User not authenticated');
+    }
+
+    // const createOrderId = await ctx.db.orderedProducts.create({
+    //   data: {
+    //     price: 123,
+    //     quantity: 1,
+    //     paymentMethod: 'card',
+    //     productId: 'jasdhfjkl',
+    //     sellerId: 'jsadfjkklj',
+    //     userId: 'asjdkfjhlk',
+    //     delivaryDate: new Date(),
+    //     status: 'pending',
+    //   },
+    // });
+
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const payment = await stripe.checkout.sessions.create({
       line_items: [
