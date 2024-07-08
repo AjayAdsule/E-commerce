@@ -90,23 +90,36 @@ export const buyerRouter = createTRPCRouter({
   checkout: buyerProcedure.input(LineItem).mutation(async ({ ctx, input }) => {
     const { amount, currency, name, quantity, productId } = input;
     const buyerId = ctx.session?.user?.id;
-    if (!buyerId) {
-      throw new Error('User not authenticated');
-    }
 
-    // const createOrderId = await ctx.db.orderedProducts.create({
-    //   data: {
-    //     price: 123,
-    //     quantity: 1,
-    //     paymentMethod: 'card',
-    //     productId: 'jasdhfjkl',
-    //     sellerId: 'jsadfjkklj',
-    //     userId: 'asjdkfjhlk',
-    //     delivaryDate: new Date(),
-    //     status: 'pending',
-    //   },
-    // });
+    // firstly we create order and then automatically append in orderProducts
+    const createOrderId = await ctx.db.orders.create({
+      data: {
+        paymentMethod: 'card',
+        status: 'pending',
+        buyerId,
+        sellerId: 'clycvph3300097tw34hyd75kl',
+        OrderedProducts: {
+          create: [],
+        },
+      },
+    });
 
+    if (!createOrderId)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'something went wrong when creating orderId',
+      });
+
+    const createOrder = await ctx.db.orderedProducts.create({
+      data: {
+        price: 123,
+        quantity: 1,
+        productId: 'jasdhfjkl',
+        delivaryDate: new Date(),
+        orderId: createOrderId?.orderId,
+      },
+    });
+    if (!createOrder) throw new TRPCError({ code: 'BAD_REQUEST', message: 'something went wrong' });
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const payment = await stripe.checkout.sessions.create({
       line_items: [
@@ -124,12 +137,13 @@ export const buyerRouter = createTRPCRouter({
         },
       ],
       mode: 'payment',
-      success_url: `http://localhost:3000/success/${orderId}?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `http://localhost:3000/success/${createOrderId?.orderId}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'http://localhost:3000',
       metadata: {
-        cartId: 'cluyqd1nf0004o21z0gg6vkzj',
+        orderId: createOrderId.orderId,
       },
     });
+
     return payment;
   }),
 

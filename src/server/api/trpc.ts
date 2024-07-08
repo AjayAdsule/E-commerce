@@ -118,7 +118,7 @@ export const sellerProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (isSeller?.role !== 'Seller')
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'If you want list product create seller accout',
+      message: 'If you want list product create seller account',
     });
   return next({
     ctx: {

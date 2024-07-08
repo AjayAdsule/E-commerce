@@ -24,7 +24,7 @@ const AuthPage = () => {
   };
 
   useEffect(() => {
-    if (session) {
+    if (session?.user) {
       redirect('/');
     }
   }, [session]);

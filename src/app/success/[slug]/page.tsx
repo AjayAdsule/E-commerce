@@ -4,7 +4,7 @@ import { clientApi } from '~/trpc/react';
 
 const Page = ({ params }: { params: { slug: string } }) => {
   const { data } = clientApi.buyer.orderStatus.useQuery(
-    'cs_test_a1tBBRbjJBaWR4D5p8hlxu5HuiLi9zCuuzhntW6YHoTTjgdtIajsrXzxtY',
+    'cs_test_a13E9sQmRrqd5urnCTWKDGepeEORg5neErlzB85unEmJMzqbk9iWuxUoIi',
   );
 
   return <div>page {params.slug}</div>;

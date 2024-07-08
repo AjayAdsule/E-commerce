@@ -67,9 +67,6 @@ export const sellerRouter = createTRPCRouter({
       where: {
         sellerProfileId: ctx.session.user.id,
       },
-      include: {
-        OrderedProducts: true,
-      },
     });
     if (!selledProduct) throw new TRPCError({ code: 'NOT_FOUND', message: 'product not found' });
     return selledProduct;

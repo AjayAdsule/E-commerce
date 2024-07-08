@@ -70,19 +70,19 @@ model VerificationToken {
 }
 
 model Profile {
-    id               String            @id @default(cuid())
-    userId           String            @unique
+    id               String   @id @default(cuid())
+    userId           String   @unique
     cart             Cart[]
-    OrderProducts    OrderedProducts[]
     shipping_address String
-    user             User              @relation(fields: [userId], references: [id])
+    user             User     @relation(fields: [userId], references: [id])
+    Orders           Orders[]
 }
 
 model SellerProfile {
-    sellerProfileId String            @id
-    user            User              @relation(fields: [sellerProfileId], references: [id])
+    sellerProfileId String     @id
+    user            User       @relation(fields: [sellerProfileId], references: [id])
     Products        Products[]
-    OrderedProducts OrderedProducts[]
+    Orders          Orders[]
 }
 
 model Cart {
@@ -134,23 +134,23 @@ model SizeModal {
 }
 
 model OrderedProducts {
-    id            String        @id @default(cuid())
-    userId        String
-    sellerId      String
-    orderAt       DateTime      @default(now())
-    productId     String
-    price         Int
-    quantity      Int
-    delivaryDate  DateTime
-    status        String
-    paymentMethod String
-    orderBy       Profile       @relation(fields: [userId], references: [userId])
-    sellBy        SellerProfile @relation(fields: [sellerId], references: [sellerProfileId])
-    orders        Orders        @relation(fields: [orderId], references: [orderId])
-    orderId       String
+    id           String    @id @default(cuid())
+    orderAt      DateTime  @default(now())
+    productId    String
+    price        Int
+    quantity     Int
+    delivaryDate DateTime?
+    orders       Orders    @relation(fields: [orderId], references: [orderId])
+    orderId      String
 }
 
 model Orders {
     orderId         String            @id @default(cuid())
     OrderedProducts OrderedProducts[]
+    status          String
+    paymentMethod   String
+    buyerId         String
+    sellerId        String
+    sellBy          SellerProfile     @relation(fields: [sellerId], references: [sellerProfileId])
+    orderBy         Profile           @relation(fields: [buyerId], references: [userId])
 }

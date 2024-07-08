@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import PaymentBtn from '../common/PaymentBtn';
-import { env } from 'process';
 
 interface CartDetailsProps {
   subTotal: number;
