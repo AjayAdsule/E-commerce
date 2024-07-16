@@ -11,7 +11,8 @@ export default function useCart() {
   const [subTotal, setSubTotalPrice] = useState(0);
   const utils = clientApi.useUtils();
   const { data } = clientApi.buyer.getCartProduct.useQuery();
-
+  clientApi.buyer.getOrder.useQuery();
+  clientApi.buyer.getOrderProduct.useQuery();
   const { mutate } = clientApi.buyer.updateQuantity.useMutation({
     onSuccess: async () => await utils.buyer.getCartProduct.invalidate(),
   });

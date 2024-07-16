@@ -3,9 +3,10 @@
 import { clientApi } from '~/trpc/react';
 
 const Page = ({ params }: { params: { slug: string } }) => {
-  const { data } = clientApi.buyer.orderStatus.useQuery(
-    'cs_test_a13E9sQmRrqd5urnCTWKDGepeEORg5neErlzB85unEmJMzqbk9iWuxUoIi',
-  );
+  const { search } = window.location;
+  const index = search.indexOf('=');
+
+  const { data } = clientApi.buyer.orderStatus.useQuery(search.slice(index + 1));
 
   return <div>page {params.slug}</div>;
 };

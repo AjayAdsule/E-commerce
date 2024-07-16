@@ -64,6 +64,7 @@ export const buyerRouter = createTRPCRouter({
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'unable to delete product from cart' });
       return deleteProduct;
     }),
+
   getCartProduct: buyerProcedure.query(async ({ ctx }) => {
     const { user } = ctx.session;
     const getBuyerCartItem = await ctx.db.cart.findMany({ where: { buyerId: user.id } });
@@ -119,13 +120,14 @@ export const buyerRouter = createTRPCRouter({
         orderId: createOrderId?.orderId,
       },
     });
+
     if (!createOrder) throw new TRPCError({ code: 'BAD_REQUEST', message: 'something went wrong' });
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const payment = await stripe.checkout.sessions.create({
       line_items: [
         {
           price_data: {
-            currency: currency,
+            currency: 'USD',
             unit_amount: amount,
             product_data: {
               name: name,
@@ -147,10 +149,29 @@ export const buyerRouter = createTRPCRouter({
     return payment;
   }),
 
-  orderStatus: buyerProcedure.input(z.string()).query(async ({ input }) => {
+  orderStatus: buyerProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     const isPaid = await stripe.checkout.sessions.retrieve(input);
-    return isPaid;
+    const { payment_status, metadata } = isPaid;
+    if (payment_status !== 'paid')
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'payment is pending' });
+
+    const getOrderId = await ctx.db.orders.findUnique({ where: { orderId: metadata?.orderId } });
+    if (!getOrderId)
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'orderId is not created' });
+    if (payment_status === 'paid' && getOrderId.status === 'pending') {
+      const updateOrderId = ctx.db.orders.update({
+        where: { orderId: getOrderId.orderId },
+        data: { status: payment_status },
+      });
+      const removeCartProductFromCart = await ctx.db.cart.deleteMany({
+        where: { buyerId: ctx.session.user.id },
+      });
+      if (!removeCartProductFromCart)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'something went wrong' });
+      return updateOrderId;
+    }
+    return getOrderId;
   }),
 
   getCart: buyerProcedure.query(async ({ ctx }) => {
@@ -161,5 +182,20 @@ export const buyerRouter = createTRPCRouter({
     });
     if (!getCart) return [];
     return getCart;
+  }),
+
+  getOrder: buyerProcedure.query(async ({ ctx }) => {
+    const getOrderId = await ctx.db.orders.findMany({ where: { buyerId: ctx.session.user.id } });
+    if (!getOrderId) throw new TRPCError({ code: 'BAD_REQUEST', message: 'orders has not found' });
+    return getOrderId;
+  }),
+
+  getOrderProduct: buyerProcedure.query(async ({ ctx }) => {
+    const getOrderedProduct = await ctx.db.orderedProducts.findMany({
+      where: { orderId: 'clyl5yxej000dgwdi77tuww4j' },
+    });
+    if (!getOrderedProduct)
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'product not found' });
+    return getOrderedProduct;
   }),
 });

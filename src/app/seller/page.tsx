@@ -1,3 +1,7 @@
 export default function SellerHome() {
-  return <></>;
+  return (
+    <>
+      <div>seller</div>
+    </>
+  );
 }
